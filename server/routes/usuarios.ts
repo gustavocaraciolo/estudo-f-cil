@@ -36,7 +36,20 @@ router.get("/:id", async (req, res) => {
 // Criar usuário
 router.post("/", async (req, res) => {
   try {
+    // Primeiro verifica se já existe um usuário com este email
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, req.body.email)
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ 
+        error: "Já existe um usuário cadastrado com este email" 
+      });
+    }
+
     const { nome_completo, email, ddi, whatsapp } = req.body;
+    console.log('Tentando criar usuário:', { nome_completo, email, ddi, whatsapp });
+    
     const novoUsuario = await db
       .insert(users)
       .values({
@@ -47,8 +60,10 @@ router.post("/", async (req, res) => {
       })
       .returning();
 
+    console.log('Usuário criado:', novoUsuario[0]);
     res.status(201).json(novoUsuario[0]);
   } catch (error) {
+    console.error('Erro ao criar usuário:', error);
     res.status(500).json({ error: "Erro ao criar usuário" });
   }
 });

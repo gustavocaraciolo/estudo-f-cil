@@ -129,11 +129,20 @@ export default function FormUsuario({
         ? error.message 
         : "Erro ao salvar usuário. Tente novamente.";
       
-      toast({
-        title: "Erro",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      if (error.response?.status === 400) {
+        const errorData = await error.response.json();
+        toast({
+          title: "Erro de validação",
+          description: errorData.error,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
