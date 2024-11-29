@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS jsonl_files (
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  certificacao_id INTEGER NOT NULL REFERENCES certificacoes(id),
+  content TEXT NOT NULL,
+  filename TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

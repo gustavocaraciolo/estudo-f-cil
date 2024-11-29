@@ -36,7 +36,7 @@ export default function GerarJsonl() {
     enabled: !!selectedCertificacao,
   });
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const selectedPerguntasData = perguntas.filter(p => 
       selectedPerguntas.includes(p.id)
     );
@@ -50,6 +50,18 @@ export default function GerarJsonl() {
       }))
       .join("\n");
 
+    // Salvar no banco
+    await fetch("/api/jsonl", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        certificacao_id: selectedCertificacao,
+        content: jsonlContent,
+        filename: `perguntas_${selectedCertificacao}_${Date.now()}.jsonl`
+      })
+    });
+
+    // Download do arquivo
     const blob = new Blob([jsonlContent], { type: "application/x-jsonlines" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

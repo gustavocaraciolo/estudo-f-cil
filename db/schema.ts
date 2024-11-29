@@ -93,6 +93,29 @@ export const respostasRelations = relations(respostas, ({ one }) => ({
   }),
 }));
 
+// Schema for jsonl_files
+export const jsonl_files = pgTable("jsonl_files", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  certificacao_id: integer("certificacao_id").references(() => certificacoes.id).notNull(),
+  content: text("content").notNull(),
+  filename: text("filename").notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Schemas for jsonl_files
+export const insertJsonlFileSchema = createInsertSchema(jsonl_files);
+export const selectJsonlFileSchema = createSelectSchema(jsonl_files);
+export type InsertJsonlFile = z.infer<typeof insertJsonlFileSchema>;
+export type JsonlFile = z.infer<typeof selectJsonlFileSchema>;
+
 export const certificacoesRelations = relations(certificacoes, ({ many }) => ({
   perguntas: many(perguntas),
+  jsonl_files: many(jsonl_files),
+}));
+
+export const jsonlFilesRelations = relations(jsonl_files, ({ one }) => ({
+  certificacao: one(certificacoes, {
+    fields: [jsonl_files.certificacao_id],
+    references: [certificacoes.id],
+  }),
 }));
