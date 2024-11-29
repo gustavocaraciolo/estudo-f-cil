@@ -16,12 +16,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxTrigger,
-} from "@/components/ui/combobox";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import type { InsertPergunta, Pergunta, Certificacao, Resposta } from "@db/schema";
@@ -187,29 +187,23 @@ export default function FormPergunta({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Certificação</FormLabel>
-                  <Combobox
-                    value={String(field.value || '')}
-                    onValueChange={(value) => {
-                      const numValue = Number(value);
-                      field.onChange(numValue);
-                    }}
+                  <Select
+                    value={field.value?.toString()}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
                   >
-                    <ComboboxTrigger>
-                      <ComboboxInput 
-                        placeholder="Selecione uma certificação"
-                        displayValue={(value) => 
-                          certificacoes.find(cert => cert.id.toString() === value)?.nome || ""
-                        }
-                      />
-                    </ComboboxTrigger>
-                    <ComboboxContent>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma certificação" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
                       {certificacoes.map((cert) => (
-                        <ComboboxItem key={cert.id} value={cert.id.toString()}>
+                        <SelectItem key={cert.id} value={cert.id.toString()}>
                           {cert.nome}
-                        </ComboboxItem>
+                        </SelectItem>
                       ))}
-                    </ComboboxContent>
-                  </Combobox>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
