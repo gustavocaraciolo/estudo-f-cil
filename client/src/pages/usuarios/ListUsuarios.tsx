@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -20,22 +21,43 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import type { User } from "@db/schema";
+import type { User, Certificacao } from "@db/schema";
+
+interface UserWithCertificacoes extends User {
+  certificacoes?: Certificacao[];
+}
 
 export default function ListUsuarios() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [usuarioParaExcluir, setUsuarioParaExcluir] = useState<User | null>(null);
   
-  const { data: usuarios, isLoading } = useQuery<User[]>({
+  const { data: usuarios, isLoading } = useQuery<UserWithCertificacoes[]>({
     queryKey: ["usuarios"],
     queryFn: async () => {
       const response = await fetch("/api/usuarios");
       if (!response.ok) {
         throw new Error("Erro ao carregar usuários");
       }
-      return response.json();
+      const users = await response.json();
+
+      // Fetch certifications for each user
+      const usersWithCerts = await Promise.all(
+        users.map(async (user: User) => {
+          const certResponse = await fetch(`/api/usuarios/${user.id}/certificacoes`);
+          const certificacoes = certResponse.ok ? await certResponse.json() : [];
+          return { ...user, certificacoes };
+        })
+      );
+
+      return usersWithCerts;
     },
   });
 
@@ -61,6 +83,7 @@ export default function ListUsuarios() {
                 <TableHead>Nome Completo</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>WhatsApp</TableHead>
+                <TableHead>Certificações</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -70,6 +93,24 @@ export default function ListUsuarios() {
                   <TableCell>{usuario.nome_completo}</TableCell>
                   <TableCell>{usuario.email}</TableCell>
                   <TableCell>{`+${usuario.ddi} ${usuario.whatsapp}`}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {usuario.certificacoes?.map((cert) => (
+                        <TooltipProvider key={cert.id}>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Badge variant="secondary">
+                                {cert.nome}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{cert.descricao || cert.nome}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ))}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Link href={`/usuarios/edit/${usuario.id}`}>

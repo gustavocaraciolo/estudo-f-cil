@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -21,13 +21,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import type { InsertUser, User, Certificacao } from "@db/schema";
 
 interface FormUsuarioProps {
   title: string;
   usuario?: User;
-  onSubmit: (data: InsertUser) => Promise<any>;
+  onSubmit: (data: InsertUser & { certificacoes?: number[] }) => Promise<any>;
 }
 
 export default function FormUsuario({
@@ -36,11 +49,13 @@ export default function FormUsuario({
   onSubmit,
 }: FormUsuarioProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedCertificacoes, setSelectedCertificacoes] = useState<number[]>([]);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: certificacoes } = useQuery<Certificacao[]>({
+  // Fetch certificações
+  const { data: certificacoes = [] } = useQuery<Certificacao[]>({
     queryKey: ["certificacoes"],
     queryFn: async () => {
       const response = await fetch("/api/certificacoes");
@@ -49,6 +64,19 @@ export default function FormUsuario({
       }
       return response.json();
     },
+  });
+
+  // Fetch user's certificações if editing
+  const { data: userCertificacoes = [] } = useQuery<Certificacao[]>({
+    queryKey: ["usuario-certificacoes", usuario?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/usuarios/${usuario?.id}/certificacoes`);
+      if (!response.ok) {
+        throw new Error("Erro ao carregar certificações do usuário");
+      }
+      return response.json();
+    },
+    enabled: !!usuario?.id,
   });
 
   const form = useForm<InsertUser>({
@@ -71,6 +99,12 @@ export default function FormUsuario({
     }
   }, [usuario, form]);
 
+  useEffect(() => {
+    if (userCertificacoes.length > 0) {
+      setSelectedCertificacoes(userCertificacoes.map(cert => cert.id));
+    }
+  }, [userCertificacoes]);
+
   const handleSubmit = async (data: InsertUser) => {
     if (!data.nome_completo?.trim()) {
       toast({
@@ -83,7 +117,7 @@ export default function FormUsuario({
 
     setIsSubmitting(true);
     try {
-      await onSubmit(data);
+      await onSubmit({ ...data, certificacoes: selectedCertificacoes });
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
       toast({
         title: "Sucesso",
@@ -186,6 +220,73 @@ export default function FormUsuario({
                 )}
               />
             </div>
+
+            <FormItem>
+              <FormLabel>Certificações</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <span>
+                      {selectedCertificacoes.length > 0
+                        ? `${selectedCertificacoes.length} selecionada(s)`
+                        : "Selecione as certificações"}
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar certificação..." />
+                    <CommandEmpty>Nenhuma certificação encontrada.</CommandEmpty>
+                    <CommandGroup className="max-h-[200px] overflow-y-auto">
+                      {certificacoes.map((cert) => (
+                        <CommandItem
+                          key={cert.id}
+                          onSelect={() => {
+                            setSelectedCertificacoes((prev) =>
+                              prev.includes(cert.id)
+                                ? prev.filter((id) => id !== cert.id)
+                                : [...prev, cert.id]
+                            );
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {selectedCertificacoes.includes(cert.id) && "✓"}
+                            {cert.nome}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedCertificacoes.map((certId) => {
+                  const cert = certificacoes.find((c) => c.id === certId);
+                  return (
+                    cert && (
+                      <Badge
+                        key={cert.id}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {cert.nome}
+                        <X
+                          className="h-3 w-3 cursor-pointer"
+                          onClick={() =>
+                            setSelectedCertificacoes((prev) =>
+                              prev.filter((id) => id !== cert.id)
+                            )
+                          }
+                        />
+                      </Badge>
+                    )
+                  );
+                })}
+              </div>
+            </FormItem>
 
             <div className="flex justify-end gap-4">
               <Button
