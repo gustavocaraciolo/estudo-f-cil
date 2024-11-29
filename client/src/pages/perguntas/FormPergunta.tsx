@@ -61,6 +61,7 @@ export default function FormPergunta({
     defaultValues: {
       certificacao_id: undefined,
       enunciado: "",
+      explicacao: "",
     },
   });
 
@@ -69,6 +70,7 @@ export default function FormPergunta({
       form.reset({
         certificacao_id: pergunta.certificacao_id,
         enunciado: pergunta.enunciado,
+        explicacao: pergunta.explicacao || "",
       });
       if (pergunta.respostas) {
         setRespostas(pergunta.respostas.map(r => ({
@@ -213,6 +215,20 @@ export default function FormPergunta({
                   <FormLabel>Enunciado</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={4} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="explicacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Explicação</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={4} placeholder="Explicação da resposta correta (opcional)" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

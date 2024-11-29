@@ -65,6 +65,7 @@ export default function ListPerguntas() {
               <TableRow>
                 <TableHead>Certificação</TableHead>
                 <TableHead>Enunciado</TableHead>
+                <TableHead>Explicação</TableHead>
                 <TableHead>Total de Respostas</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
@@ -74,6 +75,7 @@ export default function ListPerguntas() {
                 <TableRow key={pergunta.id}>
                   <TableCell>{pergunta.certificacao?.nome}</TableCell>
                   <TableCell>{pergunta.enunciado}</TableCell>
+                  <TableCell>{pergunta.explicacao || '-'}</TableCell>
                   <TableCell>{pergunta.total_respostas || 0}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">

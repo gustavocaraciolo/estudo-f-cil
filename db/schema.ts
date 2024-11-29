@@ -50,6 +50,7 @@ export const perguntas = pgTable("perguntas", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   certificacao_id: integer("certificacao_id").references(() => certificacoes.id).notNull(),
   enunciado: text("enunciado").notNull(),
+  explicacao: text("explicacao"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
