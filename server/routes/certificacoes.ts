@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../../db";
-import { certificacoes } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { certificacoes, jsonl_files } from "@db/schema";
+import { eq, exists } from "drizzle-orm";
 
 const router = Router();
 
@@ -90,3 +90,19 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+// Listar certificações que possuem arquivos JSONL
+router.get("/with-jsonl", async (_req, res) => {
+  try {
+    const result = await db.query.certificacoes.findMany({
+      where: (certificacoes, { exists }) =>
+        exists(
+          db.select()
+            .from(jsonl_files)
+            .where(eq(jsonl_files.certificacao_id, certificacoes.id))
+        )
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao listar certificações" });
+  }
+});

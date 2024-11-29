@@ -9,17 +9,30 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 
 export default function TrainModel() {
-  const [file, setFile] = useState<File | null>(null);
+  const [selectedCertificacao, setSelectedCertificacao] = useState<string>();
   const [epochs, setEpochs] = useState([3]);
   const [batchSize, setBatchSize] = useState([16]);
   const [isTraining, setIsTraining] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
+  const { data: certificacoes = [] } = useQuery<Certificacao[]>({
+    queryKey: ["certificacoes-with-jsonl"],
+    queryFn: async () => {
+      const response = await fetch("/api/certificacoes/with-jsonl");
+      if (!response.ok) throw new Error("Erro ao carregar certificações");
+      return response.json();
+    },
+  });
+
+  const { data: jsonlFile } = useQuery({
+    queryKey: ["jsonl", selectedCertificacao],
+    queryFn: async () => {
+      const response = await fetch(`/api/jsonl/certificacao/${selectedCertificacao}`);
+      if (!response.ok) throw new Error("Erro ao carregar arquivo JSONL");
+      return response.json();
+    },
+    enabled: !!selectedCertificacao,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

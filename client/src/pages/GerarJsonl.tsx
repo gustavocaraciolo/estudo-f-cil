@@ -60,17 +60,6 @@ export default function GerarJsonl() {
         filename: `perguntas_${selectedCertificacao}_${Date.now()}.jsonl`
       })
     });
-
-    // Download do arquivo
-    const blob = new Blob([jsonlContent], { type: "application/x-jsonlines" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "perguntas.jsonl";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (
