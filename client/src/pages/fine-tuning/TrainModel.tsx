@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
+import type { Certificacao } from "@db/schema";
 
 export default function TrainModel() {
   const [selectedCertificacao, setSelectedCertificacao] = useState<string>();
@@ -14,6 +16,7 @@ export default function TrainModel() {
   const [batchSize, setBatchSize] = useState([16]);
   const [isTraining, setIsTraining] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [file, setFile] = useState<File | null>(null);
 
   const { data: certificacoes = [] } = useQuery<Certificacao[]>({
     queryKey: ["certificacoes-with-jsonl"],
@@ -34,9 +37,15 @@ export default function TrainModel() {
     enabled: !!selectedCertificacao,
   });
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!selectedCertificacao || !jsonlFile) return;
 
     setIsTraining(true);
     setProgress(0);
