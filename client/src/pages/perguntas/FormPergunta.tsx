@@ -67,9 +67,13 @@ export default function FormPergunta({
 
   useEffect(() => {
     if (pergunta) {
-      // Reset form with all values
+      // Certifique-se que certificacao_id é um número
+      const certId = typeof pergunta.certificacao_id === 'string' 
+        ? parseInt(pergunta.certificacao_id) 
+        : pergunta.certificacao_id;
+
       form.reset({
-        certificacao_id: pergunta.certificacao_id,
+        certificacao_id: certId,
         enunciado: pergunta.enunciado,
         explicacao: pergunta.explicacao || "",
       });
@@ -190,7 +194,8 @@ export default function FormPergunta({
                   <FormLabel>Certificação</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
-                    value={field.value?.toString()}
+                    value={field.value?.toString() || ''}
+                    defaultValue={field.value?.toString() || ''}
                   >
                     <FormControl>
                       <SelectTrigger>
