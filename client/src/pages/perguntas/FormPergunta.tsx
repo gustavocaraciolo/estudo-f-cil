@@ -96,6 +96,26 @@ export default function FormPergunta({
   };
 
   const handleSubmit = async (data: InsertPergunta) => {
+    // Validate certificacao_id
+    if (!data.certificacao_id) {
+      toast({
+        title: "Erro de validação",
+        description: "Selecione uma certificação",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate enunciado
+    if (!data.enunciado?.trim()) {
+      toast({
+        title: "Erro de validação",
+        description: "O enunciado é obrigatório",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate minimum responses
     if (respostas.length < 3) {
       toast({
@@ -235,7 +255,7 @@ export default function FormPergunta({
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           checked={resposta.correta}
-                          onCheckedChange={(checked) => {
+                          onCheckedChange={(checked: boolean) => {
                             const newRespostas = respostas.map((r, i) => ({
                               ...r,
                               correta: i === index ? checked : false
