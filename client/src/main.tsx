@@ -11,7 +11,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route>404 Page Not Found</Route>
+      <Route>404 - Página Não Encontrada</Route>
     </Switch>
   );
 }

@@ -1,17 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Componente principal do painel de controle
 export default function DashboardContent() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <h1 className="text-3xl font-bold">Painel de Controle</h1>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>Perguntas Totais</CardTitle>
+            <CardTitle>Total de Perguntas</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">1,234</p>
+            <p className="text-3xl font-bold">1.234</p>
           </CardContent>
         </Card>
 
@@ -46,8 +47,8 @@ export default function DashboardContent() {
                 <span>2 horas atrás</span>
               </div>
               <div className="flex justify-between">
-                <span>Performance</span>
-                <span>98.5%</span>
+                <span>Desempenho</span>
+                <span>98,5%</span>
               </div>
             </div>
           </CardContent>

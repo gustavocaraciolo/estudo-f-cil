@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 
+// Interfaces para tipagem do menu de navegação
 interface MenuSection {
   title: string;
   items: MenuItem[];
@@ -35,30 +36,31 @@ interface MenuItem {
   icon: JSX.Element;
 }
 
+// Definição das seções do menu lateral
 const menuSections: MenuSection[] = [
   {
     title: "Perguntas",
     items: [
-      { name: "Listar", path: "/perguntas/list", icon: <List size={20} /> },
-      { name: "Criar", path: "/perguntas/create", icon: <Plus size={20} /> },
+      { name: "Visualizar", path: "/perguntas/list", icon: <List size={20} /> },
+      { name: "Nova Pergunta", path: "/perguntas/create", icon: <Plus size={20} /> },
     ],
   },
   {
     title: "Certificações",
     items: [
-      { name: "Listar", path: "/certificacoes/list", icon: <List size={20} /> },
-      { name: "Criar", path: "/certificacoes/create", icon: <Plus size={20} /> },
+      { name: "Visualizar", path: "/certificacoes/list", icon: <List size={20} /> },
+      { name: "Nova Certificação", path: "/certificacoes/create", icon: <Plus size={20} /> },
     ],
   },
   {
     title: "Usuários",
     items: [
-      { name: "Listar", path: "/usuarios/list", icon: <List size={20} /> },
-      { name: "Criar", path: "/usuarios/create", icon: <Plus size={20} /> },
+      { name: "Visualizar", path: "/usuarios/list", icon: <List size={20} /> },
+      { name: "Novo Usuário", path: "/usuarios/create", icon: <Plus size={20} /> },
     ],
   },
   {
-    title: "Fine-Tuning",
+    title: "Ajuste do Modelo",
     items: [
       { name: "Gerar JSONL", path: "/fine-tuning/jsonl", icon: <FileJson size={20} /> },
       { name: "Treinar Modelo", path: "/fine-tuning/train", icon: <Brain size={20} /> },
@@ -68,8 +70,8 @@ const menuSections: MenuSection[] = [
   {
     title: "Campanhas",
     items: [
-      { name: "Listar", path: "/campanhas/list", icon: <List size={20} /> },
-      { name: "Criar", path: "/campanhas/create", icon: <Plus size={20} /> },
+      { name: "Visualizar", path: "/campanhas/list", icon: <List size={20} /> },
+      { name: "Nova Campanha", path: "/campanhas/create", icon: <Plus size={20} /> },
     ],
   },
   {
@@ -103,7 +105,7 @@ export default function Sidebar() {
             className="w-full justify-start text-lg font-semibold"
           >
             <LayoutDashboard className="mr-2 h-5 w-5" />
-            Dashboard
+            Painel de Controle
           </Button>
         </Link>
       </div>
