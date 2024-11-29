@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import FormPergunta from "./FormPergunta";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import type { InsertPergunta, Pergunta, Resposta } from "@db/schema";
+import type { InsertPergunta, Pergunta, Resposta, Certificacao } from "@db/schema";
 
 interface PerguntaWithRespostas extends Pergunta {
   respostas: Resposta[];

@@ -72,6 +72,13 @@ export default function FormPergunta({
         enunciado: pergunta.enunciado,
         explicacao: pergunta.explicacao || "",
       });
+      
+      // Certifique-se que o Select está usando o valor correto
+      const certId = pergunta.certificacao_id?.toString();
+      if (certId) {
+        form.setValue("certificacao_id", parseInt(certId));
+      }
+      
       if (pergunta.respostas) {
         setRespostas(pergunta.respostas.map(r => ({
           texto: r.texto,
@@ -187,6 +194,7 @@ export default function FormPergunta({
                   <FormLabel>Certificação</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
                     defaultValue={field.value?.toString()}
                   >
                     <FormControl>
