@@ -59,7 +59,6 @@ export default function ListCertificacoes() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Descrição</TableHead>
                 <TableHead>Data de Criação</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
@@ -68,7 +67,6 @@ export default function ListCertificacoes() {
               {certificacoes?.map((certificacao) => (
                 <TableRow key={certificacao.id}>
                   <TableCell>{certificacao.nome}</TableCell>
-                  <TableCell>{certificacao.descricao}</TableCell>
                   <TableCell>
                     {new Date(certificacao.created_at).toLocaleDateString("pt-BR")}
                   </TableCell>
