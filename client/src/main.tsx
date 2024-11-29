@@ -20,6 +20,8 @@ import ListPerguntas from "./pages/perguntas/ListPerguntas";
 import CreatePergunta from "./pages/perguntas/CreatePergunta";
 import EditPergunta from "./pages/perguntas/EditPergunta";
 import GerarJsonl from "./pages/GerarJsonl";
+import TrainModel from "./pages/fine-tuning/TrainModel";
+import ModelStatus from "./pages/fine-tuning/ModelStatus";
 
 function Router() {
   return (
@@ -35,6 +37,8 @@ function Router() {
       <Route path="/perguntas/create" component={CreatePergunta} />
       <Route path="/perguntas/edit/:id" component={EditPergunta} />
       <Route path="/fine-tuning/jsonl" component={GerarJsonl} />
+      <Route path="/fine-tuning/train" component={TrainModel} />
+      <Route path="/fine-tuning/status" component={ModelStatus} />
       <Route>404 - Página Não Encontrada</Route>
     </Switch>
   );
