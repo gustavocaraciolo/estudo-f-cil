@@ -67,18 +67,13 @@ export default function FormPergunta({
 
   useEffect(() => {
     if (pergunta) {
-      // Certifique-se que certificacao_id é um número
-      const certId = typeof pergunta.certificacao_id === 'string' 
-        ? parseInt(pergunta.certificacao_id) 
-        : pergunta.certificacao_id;
-
-      form.reset({
-        certificacao_id: certId,
-        enunciado: pergunta.enunciado,
-        explicacao: pergunta.explicacao || "",
-      });
+      // Força o valor da certificação como número
+      const certId = Number(pergunta.certificacao_id);
       
-      // Set respostas if available
+      form.setValue("certificacao_id", certId);
+      form.setValue("enunciado", pergunta.enunciado);
+      form.setValue("explicacao", pergunta.explicacao || "");
+      
       if (pergunta.respostas) {
         setRespostas(pergunta.respostas.map(r => ({
           texto: r.texto,
@@ -86,7 +81,7 @@ export default function FormPergunta({
         })));
       }
     }
-  }, [pergunta, form]);
+  }, [pergunta]);
 
   const handleAddResposta = () => {
     setRespostas([...respostas, { texto: "", correta: false }]);
@@ -193,15 +188,16 @@ export default function FormPergunta({
                 <FormItem>
                   <FormLabel>Certificação</FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(parseInt(value))}
-                    value={field.value?.toString() || ''}
-                    defaultValue={field.value?.toString() || ''}
+                    onValueChange={(value) => {
+                      const numValue = Number(value);
+                      field.onChange(numValue);
+                      form.setValue("certificacao_id", numValue);
+                    }}
+                    value={String(field.value || '')}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma certificação">
-                          {certificacoes.find(cert => cert.id === field.value)?.nome || "Selecione uma certificação"}
-                        </SelectValue>
+                        <SelectValue placeholder="Selecione uma certificação" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
