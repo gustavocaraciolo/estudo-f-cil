@@ -39,12 +39,18 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
   // Update form values when certificacao prop changes
   useEffect(() => {
     if (certificacao) {
-      form.reset(certificacao);
+      console.log('Certificação recebida:', certificacao);
+      form.reset({
+        nome: certificacao.nome,
+        descricao: certificacao.descricao
+      });
     }
   }, [certificacao, form]);
 
 
   const handleSubmit = async (data: InsertCertificacao) => {
+    console.log('Dados do formulário:', data);
+    
     if (!data.nome?.trim()) {
       toast({
         title: "Erro de validação",

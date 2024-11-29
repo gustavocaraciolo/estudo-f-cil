@@ -23,6 +23,7 @@ export default function EditCertificacao() {
 
   const updateCertificacao = useMutation({
     mutationFn: async (data: InsertCertificacao) => {
+      console.log('Enviando dados para atualização:', data);
       const response = await fetch(`/api/certificacoes/${params?.id}`, {
         method: "PUT",
         headers: {
@@ -34,6 +35,10 @@ export default function EditCertificacao() {
       if (!response.ok) {
         throw new Error("Erro ao atualizar certificação");
       }
+      
+      const result = await response.json();
+      console.log('Resposta da atualização:', result);
+      return result;
     },
   });
 
