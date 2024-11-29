@@ -11,6 +11,10 @@ import ListCertificacoes from "./pages/certificacoes/ListCertificacoes";
 import CreateCertificacao from "./pages/certificacoes/CreateCertificacao";
 import EditCertificacao from "./pages/certificacoes/EditCertificacao";
 
+import ListUsuarios from "./pages/usuarios/ListUsuarios";
+import CreateUsuario from "./pages/usuarios/CreateUsuario";
+import EditUsuario from "./pages/usuarios/EditUsuario";
+
 function Router() {
   return (
     <Switch>
@@ -18,6 +22,9 @@ function Router() {
       <Route path="/certificacoes/list" component={ListCertificacoes} />
       <Route path="/certificacoes/create" component={CreateCertificacao} />
       <Route path="/certificacoes/edit/:id" component={EditCertificacao} />
+      <Route path="/usuarios/list" component={ListUsuarios} />
+      <Route path="/usuarios/create" component={CreateUsuario} />
+      <Route path="/usuarios/edit/:id" component={EditUsuario} />
       <Route>404 - Página Não Encontrada</Route>
     </Switch>
   );
