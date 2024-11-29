@@ -12,6 +12,7 @@ router.get("/", async (req, res) => {
       .select({
         id: perguntas.id,
         enunciado: perguntas.enunciado,
+        explicacao: perguntas.explicacao,
         certificacao_id: perguntas.certificacao_id,
         created_at: perguntas.created_at,
         updated_at: perguntas.updated_at,
@@ -48,7 +49,7 @@ router.get("/:id", async (req, res) => {
 
     res.json(pergunta);
   } catch (error) {
-    console.error('Erro ao buscar pergunta:', error);
+    console.error('Erro ao buscar:', error);
     res.status(500).json({ error: "Erro ao buscar pergunta" });
   }
 });
@@ -56,29 +57,25 @@ router.get("/:id", async (req, res) => {
 // Criar pergunta
 router.post("/", async (req, res) => {
   try {
-    const { certificacao_id, enunciado, respostas: respostasData } = req.body;
-    console.log('Dados recebidos:', { certificacao_id, enunciado, respostasData });
-
-    // Criar pergunta
+    const { certificacao_id, enunciado, explicacao, respostas: respostasData } = req.body;
+    
     const novaPergunta = await db
       .insert(perguntas)
       .values({
         certificacao_id,
         enunciado,
+        explicacao,
       })
       .returning();
-    console.log('Pergunta criada:', novaPergunta[0]);
 
-    // Criar respostas
     if (respostasData && respostasData.length > 0) {
-      const novasRespostas = await db.insert(respostas).values(
+      await db.insert(respostas).values(
         respostasData.map((resposta: { texto: string; correta: boolean }) => ({
           pergunta_id: novaPergunta[0].id,
           texto: resposta.texto,
           correta: resposta.correta,
         }))
-      ).returning();
-      console.log('Respostas criadas:', novasRespostas);
+      );
     }
 
     res.status(201).json(novaPergunta[0]);
@@ -92,14 +89,14 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { certificacao_id, enunciado, respostas: respostasData } = req.body;
+    const { certificacao_id, enunciado, explicacao, respostas: respostasData } = req.body;
 
-    // Atualizar pergunta
     const perguntaAtualizada = await db
       .update(perguntas)
       .set({
         certificacao_id,
         enunciado,
+        explicacao,
         updated_at: new Date(),
       })
       .where(eq(perguntas.id, parseInt(id)))
@@ -128,6 +125,7 @@ router.put("/:id", async (req, res) => {
 
     res.json(perguntaAtualizada[0]);
   } catch (error) {
+    console.error('Erro ao atualizar:', error);
     res.status(500).json({ error: "Erro ao atualizar pergunta" });
   }
 });
@@ -136,13 +134,8 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Primeiro excluir todas as respostas relacionadas
-    await db
-      .delete(respostas)
-      .where(eq(respostas.pergunta_id, parseInt(id)));
-
-    // Depois excluir a pergunta
+    
+    // With CASCADE delete, we don't need to manually delete respostas
     const perguntaExcluida = await db
       .delete(perguntas)
       .where(eq(perguntas.id, parseInt(id)))
@@ -154,6 +147,7 @@ router.delete("/:id", async (req, res) => {
 
     res.json({ message: "Pergunta excluída com sucesso" });
   } catch (error) {
+    console.error('Erro ao excluir:', error);
     res.status(500).json({ error: "Erro ao excluir pergunta" });
   }
 });
