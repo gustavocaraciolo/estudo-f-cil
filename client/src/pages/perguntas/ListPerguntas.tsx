@@ -138,6 +138,7 @@ export default function ListPerguntas() {
                     });
                   } finally {
                     setPerguntaParaExcluir(null);
+                    queryClient.invalidateQueries({ queryKey: ["perguntas"] });
                   }
                 }}
               >

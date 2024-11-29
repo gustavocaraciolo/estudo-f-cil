@@ -11,27 +11,19 @@ router.get("/", async (req, res) => {
     const listaPerguntas = await db.query.perguntas.findMany({
       with: {
         certificacao: true,
+        respostas: true,
       },
     });
 
-    // Buscar total de respostas para cada pergunta
-    const perguntasComDetalhes = await Promise.all(
-      listaPerguntas.map(async (pergunta) => {
-        const totalRespostas = await db
-          .select({ count: sql`count(*)` })
-          .from(respostas)
-          .where(eq(respostas.pergunta_id, pergunta.id))
-          .then(result => result[0]?.count || 0);
-
-        return {
-          ...pergunta,
-          total_respostas: Number(totalRespostas),
-        };
-      })
-    );
+    // Transformar os dados para o formato necessário
+    const perguntasComDetalhes = listaPerguntas.map((pergunta) => ({
+      ...pergunta,
+      total_respostas: pergunta.respostas.length,
+    }));
 
     res.json(perguntasComDetalhes);
   } catch (error) {
+    console.error('Erro ao listar perguntas:', error);
     res.status(500).json({ error: "Erro ao listar perguntas" });
   }
 });
