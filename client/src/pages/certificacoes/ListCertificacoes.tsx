@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link } from "wouter";
 import {
   Table,
@@ -9,11 +10,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import type { Certificacao } from "@db/schema";
 
 export default function ListCertificacoes() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [certificacaoParaExcluir, setCertificacaoParaExcluir] = useState<Certificacao | null>(null);
+  
   const { data: certificacoes, isLoading } = useQuery<Certificacao[]>({
     queryKey: ["certificacoes"],
     queryFn: async () => {
@@ -59,17 +73,80 @@ export default function ListCertificacoes() {
                     {new Date(certificacao.created_at).toLocaleDateString("pt-BR")}
                   </TableCell>
                   <TableCell>
-                    <Link href={`/certificacoes/edit/${certificacao.id}`}>
-                      <Button variant="outline" size="sm">
-                        Editar
+                    <div className="flex gap-2">
+                      <Link href={`/certificacoes/edit/${certificacao.id}`}>
+                        <Button variant="outline" size="sm">
+                          Editar
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setCertificacaoParaExcluir(certificacao)}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
-                    </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
+
+        <Dialog open={!!certificacaoParaExcluir} onOpenChange={() => setCertificacaoParaExcluir(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar Exclusão</DialogTitle>
+              <DialogDescription>
+                Tem certeza que deseja excluir a certificação "{certificacaoParaExcluir?.nome}"?
+                Esta ação não pode ser desfeita.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setCertificacaoParaExcluir(null)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (!certificacaoParaExcluir) return;
+                  
+                  try {
+                    const response = await fetch(
+                      `/api/certificacoes/${certificacaoParaExcluir.id}`,
+                      { method: "DELETE" }
+                    );
+                    
+                    if (!response.ok) {
+                      throw new Error("Erro ao excluir certificação");
+                    }
+
+                    toast({
+                      title: "Sucesso",
+                      description: "Certificação excluída com sucesso!",
+                    });
+
+                    queryClient.invalidateQueries({ queryKey: ["certificacoes"] });
+                  } catch (error) {
+                    toast({
+                      title: "Erro",
+                      description: "Erro ao excluir certificação. Tente novamente.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setCertificacaoParaExcluir(null);
+                  }
+                }}
+              >
+                Excluir
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

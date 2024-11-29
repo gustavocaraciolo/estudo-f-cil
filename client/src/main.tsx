@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 
 import ListCertificacoes from "./pages/certificacoes/ListCertificacoes";
 import CreateCertificacao from "./pages/certificacoes/CreateCertificacao";
+import EditCertificacao from "./pages/certificacoes/EditCertificacao";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/certificacoes/list" component={ListCertificacoes} />
       <Route path="/certificacoes/create" component={CreateCertificacao} />
+      <Route path="/certificacoes/edit/:id" component={EditCertificacao} />
       <Route>404 - Página Não Encontrada</Route>
     </Switch>
   );
