@@ -233,18 +233,18 @@ export default function FormPergunta({
                     </div>
                     <div className="space-y-2">
                       <RadioGroup
-                        value={resposta.correta ? "true" : "false"}
+                        value={index.toString()}
                         onValueChange={(value) => {
                           const newRespostas = respostas.map((r, i) => ({
                             ...r,
-                            correta: i === index ? value === "true" : false,
+                            correta: i.toString() === value
                           }));
                           setRespostas(newRespostas);
                         }}
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="true" id={`correct-${index}`} />
-                          <label htmlFor={`correct-${index}`}>Correta</label>
+                          <RadioGroupItem value={index.toString()} id={`correct-${index}`} />
+                          <label htmlFor={`correct-${index}`}>Resposta Correta</label>
                         </div>
                       </RadioGroup>
                       <Button
