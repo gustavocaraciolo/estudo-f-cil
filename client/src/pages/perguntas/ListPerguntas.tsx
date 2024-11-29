@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "wouter";
 import {
@@ -30,6 +30,7 @@ interface PerguntaWithDetails extends Pergunta {
 
 export default function ListPerguntas() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [perguntaParaExcluir, setPerguntaParaExcluir] = useState<Pergunta | null>(null);
   
   const { data: perguntas, isLoading } = useQuery<PerguntaWithDetails[]>({
