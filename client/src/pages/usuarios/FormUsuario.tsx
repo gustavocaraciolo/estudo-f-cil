@@ -125,15 +125,11 @@ export default function FormUsuario({
       });
       setLocation("/usuarios/list");
     } catch (error: any) {
-      console.error('Erro completo:', error);
+      let errorMessage = "Erro ao salvar usuário";
       
-      let errorMessage = "Erro ao salvar usuário. Tente novamente.";
-      
-      // Verifica se é um erro da API com resposta
-      if (error instanceof Error && 'response' in error) {
-        const response = error.response as Response;
-        const errorData = await response.json();
-        errorMessage = errorData.error;
+      if (error.response) {
+        const errorData = await error.response.json();
+        errorMessage = errorData.error || errorMessage;
       }
       
       toast({
@@ -141,8 +137,6 @@ export default function FormUsuario({
         description: errorMessage,
         variant: "destructive",
       });
-      
-      console.error("Erro ao salvar usuário:", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -205,6 +199,7 @@ export default function FormUsuario({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="244">+244 (Angola)</SelectItem>
                         <SelectItem value="55">+55 (Brasil)</SelectItem>
                         <SelectItem value="351">+351 (Portugal)</SelectItem>
                         <SelectItem value="1">+1 (EUA/Canadá)</SelectItem>
