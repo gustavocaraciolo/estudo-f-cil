@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import type { InsertPergunta, Pergunta, Certificacao, Resposta } from "@db/schema";
 
@@ -232,21 +232,25 @@ export default function FormPergunta({
                       </FormItem>
                     </div>
                     <div className="space-y-2">
-                      <RadioGroup
-                        value={index.toString()}
-                        onValueChange={(value) => {
-                          const newRespostas = respostas.map((r, i) => ({
-                            ...r,
-                            correta: i.toString() === value
-                          }));
-                          setRespostas(newRespostas);
-                        }}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value={index.toString()} id={`correct-${index}`} />
-                          <label htmlFor={`correct-${index}`}>Resposta Correta</label>
-                        </div>
-                      </RadioGroup>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={resposta.correta}
+                          onCheckedChange={(checked) => {
+                            const newRespostas = respostas.map((r, i) => ({
+                              ...r,
+                              correta: i === index ? checked : false
+                            }));
+                            setRespostas(newRespostas);
+                          }}
+                          id={`correct-${index}`}
+                        />
+                        <label
+                          htmlFor={`correct-${index}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Resposta Correta
+                        </label>
+                      </div>
                       <Button
                         type="button"
                         variant="ghost"
