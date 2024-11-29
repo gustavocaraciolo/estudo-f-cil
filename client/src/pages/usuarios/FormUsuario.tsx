@@ -124,24 +124,16 @@ export default function FormUsuario({
         description: "Usuário salvo com sucesso!",
       });
       setLocation("/usuarios/list");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro completo:', error);
       
       let errorMessage = "Erro ao salvar usuário. Tente novamente.";
       
-      // Tenta extrair a mensagem de erro da API
-      if (error.response) {
-        try {
-          const errorData = await error.response.json();
-          errorMessage = errorData.error;
-        } catch {
-          // Se não conseguir fazer parse do JSON, usa a mensagem padrão
-          if (error.response.status === 400) {
-            errorMessage = "Dados inválidos. Verifique as informações.";
-          }
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
+      // Verifica se é um erro da API com resposta
+      if (error instanceof Error && 'response' in error) {
+        const response = error.response as Response;
+        const errorData = await response.json();
+        errorMessage = errorData.error;
       }
       
       toast({
