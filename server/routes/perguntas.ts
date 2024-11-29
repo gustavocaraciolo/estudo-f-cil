@@ -8,20 +8,22 @@ const router = Router();
 // Listar todas as perguntas
 router.get("/", async (req, res) => {
   try {
-    const listaPerguntas = await db.query.perguntas.findMany({
-      with: {
-        certificacao: true,
-        respostas: true,
-      },
-    });
+    const listaPerguntas = await db
+      .select({
+        id: perguntas.id,
+        enunciado: perguntas.enunciado,
+        certificacao_id: perguntas.certificacao_id,
+        created_at: perguntas.created_at,
+        updated_at: perguntas.updated_at,
+        certificacao: certificacoes,
+        total_respostas: sql<number>`count(${respostas.id})::int`,
+      })
+      .from(perguntas)
+      .leftJoin(certificacoes, eq(perguntas.certificacao_id, certificacoes.id))
+      .leftJoin(respostas, eq(respostas.pergunta_id, perguntas.id))
+      .groupBy(perguntas.id, certificacoes.id);
 
-    // Transformar os dados para o formato necessário
-    const perguntasComDetalhes = listaPerguntas.map((pergunta) => ({
-      ...pergunta,
-      total_respostas: pergunta.respostas.length,
-    }));
-
-    res.json(perguntasComDetalhes);
+    res.json(listaPerguntas);
   } catch (error) {
     console.error('Erro ao listar perguntas:', error);
     res.status(500).json({ error: "Erro ao listar perguntas" });

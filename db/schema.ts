@@ -1,5 +1,6 @@
 import { pgTable, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 export const users = pgTable("users", {
@@ -74,3 +75,23 @@ export const insertRespostaSchema = createInsertSchema(respostas);
 export const selectRespostaSchema = createSelectSchema(respostas);
 export type InsertResposta = z.infer<typeof insertRespostaSchema>;
 export type Resposta = z.infer<typeof selectRespostaSchema>;
+
+// Define relations
+export const perguntasRelations = relations(perguntas, ({ one, many }) => ({
+  certificacao: one(certificacoes, {
+    fields: [perguntas.certificacao_id],
+    references: [certificacoes.id],
+  }),
+  respostas: many(respostas),
+}));
+
+export const respostasRelations = relations(respostas, ({ one }) => ({
+  pergunta: one(perguntas, {
+    fields: [respostas.pergunta_id],
+    references: [perguntas.id],
+  }),
+}));
+
+export const certificacoesRelations = relations(certificacoes, ({ many }) => ({
+  perguntas: many(perguntas),
+}));
