@@ -61,6 +61,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { certificacao_id, enunciado, respostas: respostasData } = req.body;
+    console.log('Dados recebidos:', { certificacao_id, enunciado, respostasData });
 
     // Criar pergunta
     const novaPergunta = await db
@@ -70,20 +71,23 @@ router.post("/", async (req, res) => {
         enunciado,
       })
       .returning();
+    console.log('Pergunta criada:', novaPergunta[0]);
 
     // Criar respostas
     if (respostasData && respostasData.length > 0) {
-      await db.insert(respostas).values(
+      const novasRespostas = await db.insert(respostas).values(
         respostasData.map((resposta: { texto: string; correta: boolean }) => ({
           pergunta_id: novaPergunta[0].id,
           texto: resposta.texto,
           correta: resposta.correta,
         }))
-      );
+      ).returning();
+      console.log('Respostas criadas:', novasRespostas);
     }
 
     res.status(201).json(novaPergunta[0]);
   } catch (error) {
+    console.error('Erro detalhado:', error);
     res.status(500).json({ error: "Erro ao criar pergunta" });
   }
 });
