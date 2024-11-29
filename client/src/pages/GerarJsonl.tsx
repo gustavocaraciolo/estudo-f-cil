@@ -96,17 +96,27 @@ export default function GerarJsonl() {
                 <ScrollArea className="h-[400px] p-4">
                   <div className="space-y-4">
                     {perguntas.map((pergunta) => (
-                      <div key={pergunta.id} className="flex items-start space-x-3">
-                        <Checkbox
-                          checked={selectedPerguntas.includes(pergunta.id)}
-                          onCheckedChange={(checked) => {
-                            setSelectedPerguntas(prev =>
-                              checked
-                                ? [...prev, pergunta.id]
-                                : prev.filter(id => id !== pergunta.id)
-                            );
-                          }}
-                        />
+                      <div key={pergunta.id} className="flex items-start space-x-3 hover:bg-accent/50 p-2 rounded-md">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`pergunta-${pergunta.id}`}
+                            checked={selectedPerguntas.includes(pergunta.id)}
+                            onCheckedChange={(checked) => {
+                              setSelectedPerguntas(prev =>
+                                checked
+                                  ? [...prev, pergunta.id]
+                                  : prev.filter(id => id !== pergunta.id)
+                              );
+                            }}
+                            className="border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                          />
+                          <label
+                            htmlFor={`pergunta-${pergunta.id}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Selecionar
+                          </label>
+                        </div>
                         <div className="space-y-1">
                           <p className="text-sm font-medium leading-none">
                             {pergunta.enunciado}
