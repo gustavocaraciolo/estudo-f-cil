@@ -1,0 +1,18 @@
+-- Create perguntas table
+CREATE TABLE IF NOT EXISTS perguntas (
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  certificacao_id INTEGER NOT NULL REFERENCES certificacoes(id),
+  enunciado TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Create respostas table
+CREATE TABLE IF NOT EXISTS respostas (
+  id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  pergunta_id INTEGER NOT NULL REFERENCES perguntas(id),
+  texto TEXT NOT NULL,
+  correta BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

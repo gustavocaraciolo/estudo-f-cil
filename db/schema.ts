@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -43,3 +43,34 @@ export const insertUsuarioCertificacaoSchema = createInsertSchema(usuarios_certi
 export const selectUsuarioCertificacaoSchema = createSelectSchema(usuarios_certificacoes);
 export type InsertUsuarioCertificacao = z.infer<typeof insertUsuarioCertificacaoSchema>;
 export type UsuarioCertificacao = z.infer<typeof selectUsuarioCertificacaoSchema>;
+
+// Schema para perguntas
+export const perguntas = pgTable("perguntas", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  certificacao_id: integer("certificacao_id").references(() => certificacoes.id).notNull(),
+  enunciado: text("enunciado").notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Schema para respostas
+export const respostas = pgTable("respostas", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  pergunta_id: integer("pergunta_id").references(() => perguntas.id).notNull(),
+  texto: text("texto").notNull(),
+  correta: boolean("correta").default(false).notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Schemas para perguntas
+export const insertPerguntaSchema = createInsertSchema(perguntas);
+export const selectPerguntaSchema = createSelectSchema(perguntas);
+export type InsertPergunta = z.infer<typeof insertPerguntaSchema>;
+export type Pergunta = z.infer<typeof selectPerguntaSchema>;
+
+// Schemas para respostas
+export const insertRespostaSchema = createInsertSchema(respostas);
+export const selectRespostaSchema = createSelectSchema(respostas);
+export type InsertResposta = z.infer<typeof insertRespostaSchema>;
+export type Resposta = z.infer<typeof selectRespostaSchema>;

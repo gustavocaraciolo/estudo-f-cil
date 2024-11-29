@@ -16,6 +16,10 @@ import ListUsuarios from "./pages/usuarios/ListUsuarios";
 import CreateUsuario from "./pages/usuarios/CreateUsuario";
 import EditUsuario from "./pages/usuarios/EditUsuario";
 
+import ListPerguntas from "./pages/perguntas/ListPerguntas";
+import CreatePergunta from "./pages/perguntas/CreatePergunta";
+import EditPergunta from "./pages/perguntas/EditPergunta";
+
 function Router() {
   return (
     <Switch>
@@ -26,6 +30,9 @@ function Router() {
       <Route path="/usuarios/list" component={ListUsuarios} />
       <Route path="/usuarios/create" component={CreateUsuario} />
       <Route path="/usuarios/edit/:id" component={EditUsuario} />
+      <Route path="/perguntas/list" component={ListPerguntas} />
+      <Route path="/perguntas/create" component={CreatePergunta} />
+      <Route path="/perguntas/edit/:id" component={EditPergunta} />
       <Route>404 - Página Não Encontrada</Route>
     </Switch>
   );
