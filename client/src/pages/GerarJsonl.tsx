@@ -11,11 +11,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
 import type { Certificacao, Pergunta, Resposta } from "@db/schema";
 
 export default function GerarJsonl() {
   const [selectedCertificacao, setSelectedCertificacao] = useState<string>();
   const [selectedPerguntas, setSelectedPerguntas] = useState<number[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const { data: certificacoes = [] } = useQuery<Certificacao[]>({
     queryKey: ["certificacoes"],
@@ -36,30 +41,55 @@ export default function GerarJsonl() {
     enabled: !!selectedCertificacao,
   });
 
-  const handleDownload = async () => {
-    const selectedPerguntasData = perguntas.filter(p => 
-      selectedPerguntas.includes(p.id)
-    );
+  const handleSave = async () => {
+    setIsSaving(true);
+    setProgress(0);
+    
+    try {
+      const selectedPerguntasData = perguntas.filter(p => 
+        selectedPerguntas.includes(p.id)
+      );
 
-    const jsonlContent = selectedPerguntasData
-      .map(p => JSON.stringify({
-        id: p.id,
-        pergunta: p.enunciado,
-        explicacao: p.explicacao,
-        respostas: p.respostas
-      }))
-      .join("\n");
+      const jsonlContent = selectedPerguntasData
+        .map(p => JSON.stringify({
+          id: p.id,
+          pergunta: p.enunciado,
+          explicacao: p.explicacao,
+          respostas: p.respostas
+        }))
+        .join("\n");
 
-    // Salvar no banco
-    await fetch("/api/jsonl", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        certificacao_id: selectedCertificacao,
-        content: jsonlContent,
-        filename: `perguntas_${selectedCertificacao}_${Date.now()}.jsonl`
-      })
-    });
+      // Simular progresso
+      const interval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      // Salvar no banco
+      await fetch("/api/jsonl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          certificacao_id: selectedCertificacao,
+          content: jsonlContent,
+          filename: `perguntas_${selectedCertificacao}_${Date.now()}.jsonl`
+        })
+      });
+
+      clearInterval(interval);
+      setProgress(100);
+      
+      // Limpar após 1 segundo
+      setTimeout(() => {
+        setIsSaving(false);
+        setProgress(0);
+        setSelectedPerguntas([]);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Erro ao salvar arquivo JSONL:', error);
+      setIsSaving(false);
+      setProgress(0);
+    }
   };
 
   return (
@@ -134,11 +164,29 @@ export default function GerarJsonl() {
                 </ScrollArea>
               </div>
 
+              {isSaving && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <Progress value={progress} className="w-full" />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {progress}% completo
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
               <Button
-                onClick={handleDownload}
-                disabled={selectedPerguntas.length === 0}
+                onClick={handleSave}
+                disabled={selectedPerguntas.length === 0 || isSaving}
               >
-                Gerar JSONL
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  "Gerar JSONL"
+                )}
               </Button>
             </>
           )}
