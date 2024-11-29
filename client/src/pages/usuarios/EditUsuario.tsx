@@ -43,11 +43,11 @@ export default function EditUsuario() {
           throw new Error("Erro ao carregar certificações atuais");
         }
         const currentCerts = await currentCertsResponse.json();
-        const currentCertIds = currentCerts.map((cert: any) => cert.id);
+        const currentCertIds = currentCerts.map((cert: { id: number }) => cert.id);
 
         // Calculate differences
-        const toAdd = data.certificacoes.filter(id => !currentCertIds.includes(id));
-        const toRemove = currentCertIds.filter(id => !data.certificacoes?.includes(id));
+        const toAdd = data.certificacoes.filter((certId: number) => !currentCertIds.includes(certId));
+        const toRemove = currentCertIds.filter((certId: number) => !data.certificacoes?.includes(certId));
 
         // Add new certifications
         for (const certId of toAdd) {
