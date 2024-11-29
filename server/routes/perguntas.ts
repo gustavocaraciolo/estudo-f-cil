@@ -1,30 +1,20 @@
-import { Router } from "express";
 import { db } from "db";
-import { eq, sql } from "drizzle-orm";
-import { perguntas, respostas, certificacoes } from "@db/schema";
+import { perguntas, respostas } from "@db/schema";
+import { eq } from "drizzle-orm";
+import { Router } from "express";
 
 const router = Router();
 
 // Listar todas as perguntas
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   try {
-    const listaPerguntas = await db
-      .select({
-        id: perguntas.id,
-        enunciado: perguntas.enunciado,
-        explicacao: perguntas.explicacao,
-        certificacao_id: perguntas.certificacao_id,
-        created_at: perguntas.created_at,
-        updated_at: perguntas.updated_at,
-        certificacao: certificacoes,
-        total_respostas: sql<number>`count(${respostas.id})::int`,
-      })
-      .from(perguntas)
-      .leftJoin(certificacoes, eq(perguntas.certificacao_id, certificacoes.id))
-      .leftJoin(respostas, eq(respostas.pergunta_id, perguntas.id))
-      .groupBy(perguntas.id, certificacoes.id);
-
-    res.json(listaPerguntas);
+    const allPerguntas = await db.query.perguntas.findMany({
+      with: {
+        respostas: true,
+        certificacao: true,
+      },
+    });
+    res.json(allPerguntas);
   } catch (error) {
     console.error('Erro ao listar perguntas:', error);
     res.status(500).json({ error: "Erro ao listar perguntas" });
@@ -35,20 +25,19 @@ router.get("/", async (req, res) => {
 router.get("/certificacao/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const perguntas = await db.query.perguntas.findMany({
+    const perguntasResult = await db.query.perguntas.findMany({
       where: eq(perguntas.certificacao_id, parseInt(id)),
       with: {
         respostas: true,
       },
     });
 
-    res.json(perguntas);
+    res.json(perguntasResult);
   } catch (error) {
     console.error('Erro ao listar perguntas por certificação:', error);
     res.status(500).json({ error: "Erro ao listar perguntas" });
   }
 });
-
 
 // Buscar pergunta por ID
 router.get("/:id", async (req, res) => {
