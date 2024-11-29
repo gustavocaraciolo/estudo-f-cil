@@ -125,24 +125,32 @@ export default function FormUsuario({
       });
       setLocation("/usuarios/list");
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Erro ao salvar usuário. Tente novamente.";
+      console.error('Erro completo:', error);
       
-      if (error.response?.status === 400) {
-        const errorData = await error.response.json();
-        toast({
-          title: "Erro de validação",
-          description: errorData.error,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Erro",
-          description: errorMessage,
-          variant: "destructive",
-        });
+      let errorMessage = "Erro ao salvar usuário. Tente novamente.";
+      
+      // Tenta extrair a mensagem de erro da API
+      if (error.response) {
+        try {
+          const errorData = await error.response.json();
+          errorMessage = errorData.error;
+        } catch {
+          // Se não conseguir fazer parse do JSON, usa a mensagem padrão
+          if (error.response.status === 400) {
+            errorMessage = "Dados inválidos. Verifique as informações.";
+          }
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
+      
+      toast({
+        title: "Erro",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      console.error("Erro ao salvar usuário:", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
