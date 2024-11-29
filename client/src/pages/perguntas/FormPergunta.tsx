@@ -190,11 +190,13 @@ export default function FormPergunta({
                   <FormLabel>Certificação</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
-                    defaultValue={field.value?.toString()}
+                    value={field.value?.toString()}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma certificação" />
+                        <SelectValue placeholder="Selecione uma certificação">
+                          {certificacoes.find(cert => cert.id === field.value)?.nome || "Selecione uma certificação"}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
