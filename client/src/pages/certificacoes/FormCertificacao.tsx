@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -25,6 +27,7 @@ interface FormCertificacaoProps {
 export default function FormCertificacao({ certificacao, onSubmit, title }: FormCertificacaoProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<InsertCertificacao>({
     resolver: zodResolver(insertCertificacaoSchema),
@@ -35,6 +38,16 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
   });
 
   const handleSubmit = async (data: InsertCertificacao) => {
+    if (!data.nome?.trim()) {
+      toast({
+        title: "Erro de validação",
+        description: "O nome da certificação é obrigatório",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       await onSubmit(data);
       toast({
@@ -43,11 +56,20 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
       });
       setLocation("/certificacoes/list");
     } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Erro ao salvar certificação. Tente novamente.";
+      
       toast({
         title: "Erro",
-        description: "Erro ao salvar certificação. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // Log the error for debugging
+      console.error("Erro ao salvar certificação:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -99,7 +121,16 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
               >
                 Cancelar
               </Button>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  "Salvar"
+                )}
+              </Button>
             </div>
           </form>
         </Form>
