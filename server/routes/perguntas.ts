@@ -31,6 +31,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Listar perguntas por certificação
+router.get("/certificacao/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const perguntas = await db.query.perguntas.findMany({
+      where: eq(schema.perguntas.certificacao_id, parseInt(id)),
+      with: {
+        respostas: true,
+      },
+    });
+
+    res.json(perguntas);
+  } catch (error) {
+    console.error('Erro ao listar perguntas por certificação:', error);
+    res.status(500).json({ error: "Erro ao listar perguntas" });
+  }
+});
+
+
 // Buscar pergunta por ID
 router.get("/:id", async (req, res) => {
   try {
