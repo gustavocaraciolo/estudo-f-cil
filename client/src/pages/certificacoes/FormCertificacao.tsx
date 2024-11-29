@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import {
   Form,
@@ -12,31 +15,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { insertCertificacaoSchema, type InsertCertificacao } from "@db/schema";
-import { useLocation } from "wouter";
+import type { InsertCertificacao, Certificacao } from "@db/schema";
 
 interface FormCertificacaoProps {
-  certificacao?: InsertCertificacao;
-  onSubmit: (data: InsertCertificacao) => Promise<void>;
   title: string;
+  certificacao?: Certificacao;
+  onSubmit: (data: InsertCertificacao) => Promise<any>;
 }
 
-export default function FormCertificacao({ certificacao, onSubmit, title }: FormCertificacaoProps) {
-  const { toast } = useToast();
-  const [, setLocation] = useLocation();
+export default function FormCertificacao({
+  title,
+  certificacao,
+  onSubmit,
+}: FormCertificacaoProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const form = useForm<InsertCertificacao>({
-    resolver: zodResolver(insertCertificacaoSchema),
-    defaultValues: certificacao || {
+    defaultValues: {
       nome: "",
       descricao: "",
     },
   });
-  // Update form values when certificacao prop changes
+
   useEffect(() => {
     if (certificacao) {
       console.log('Certificação recebida:', certificacao);
@@ -46,7 +50,6 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
       });
     }
   }, [certificacao, form]);
-
 
   const handleSubmit = async (data: InsertCertificacao) => {
     console.log('Dados do formulário:', data);
@@ -63,6 +66,8 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
     setIsSubmitting(true);
     try {
       await onSubmit(data);
+      // Invalidate queries after successful submission
+      queryClient.invalidateQueries({ queryKey: ["certificacoes"] });
       toast({
         title: "Sucesso",
         description: "Certificação salva com sucesso!",
@@ -79,7 +84,6 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
         variant: "destructive",
       });
       
-      // Log the error for debugging
       console.error("Erro ao salvar certificação:", error);
     } finally {
       setIsSubmitting(false);
