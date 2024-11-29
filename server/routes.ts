@@ -1,6 +1,7 @@
 import type { Express } from "express";
+import certificacoesRouter from "./routes/certificacoes";
 
 export function registerRoutes(app: Express) {
-  // put application routes here
-  // prefix all routes with /api
+  // Prefix all routes with /api
+  app.use("/api/certificacoes", certificacoesRouter);
 }
