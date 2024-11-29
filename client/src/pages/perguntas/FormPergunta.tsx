@@ -67,18 +67,14 @@ export default function FormPergunta({
 
   useEffect(() => {
     if (pergunta) {
+      // Reset form with all values
       form.reset({
         certificacao_id: pergunta.certificacao_id,
         enunciado: pergunta.enunciado,
         explicacao: pergunta.explicacao || "",
       });
       
-      // Certifique-se que o Select está usando o valor correto
-      const certId = pergunta.certificacao_id?.toString();
-      if (certId) {
-        form.setValue("certificacao_id", parseInt(certId));
-      }
-      
+      // Set respostas if available
       if (pergunta.respostas) {
         setRespostas(pergunta.respostas.map(r => ({
           texto: r.texto,
@@ -194,7 +190,6 @@ export default function FormPergunta({
                   <FormLabel>Certificação</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
-                    value={field.value?.toString()}
                     defaultValue={field.value?.toString()}
                   >
                     <FormControl>
