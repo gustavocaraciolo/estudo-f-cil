@@ -14,6 +14,24 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar certificações" });
   }
 });
+// Buscar certificação por ID
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const certificacao = await db.query.certificacoes.findFirst({
+      where: eq(certificacoes.id, parseInt(id))
+    });
+    
+    if (!certificacao) {
+      return res.status(404).json({ error: "Certificação não encontrada" });
+    }
+    
+    res.json(certificacao);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar certificação" });
+  }
+});
+
 
 // Criar certificação
 router.post("/", async (req, res) => {

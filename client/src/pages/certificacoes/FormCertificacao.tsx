@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +36,13 @@ export default function FormCertificacao({ certificacao, onSubmit, title }: Form
       descricao: "",
     },
   });
+  // Update form values when certificacao prop changes
+  useEffect(() => {
+    if (certificacao) {
+      form.reset(certificacao);
+    }
+  }, [certificacao, form]);
+
 
   const handleSubmit = async (data: InsertCertificacao) => {
     if (!data.nome?.trim()) {
