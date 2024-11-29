@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useRoute } from "wouter";
 import FormCertificacao from "./FormCertificacao";
@@ -9,6 +9,7 @@ export default function EditCertificacao() {
   const [, params] = useRoute<{ id: string }>("/certificacoes/edit/:id");
   const { toast } = useToast();
 
+  const queryClient = useQueryClient();
   const { data: certificacao, isLoading } = useQuery<Certificacao>({
     queryKey: ["certificacao", params?.id],
     queryFn: async () => {
@@ -19,11 +20,11 @@ export default function EditCertificacao() {
       return response.json();
     },
     enabled: !!params?.id,
+    staleTime: 0, // Força revalidação sempre
   });
 
   const updateCertificacao = useMutation({
     mutationFn: async (data: InsertCertificacao) => {
-      console.log('Enviando dados para atualização:', data);
       const response = await fetch(`/api/certificacoes/${params?.id}`, {
         method: "PUT",
         headers: {
@@ -35,11 +36,13 @@ export default function EditCertificacao() {
       if (!response.ok) {
         throw new Error("Erro ao atualizar certificação");
       }
-      
-      const result = await response.json();
-      console.log('Resposta da atualização:', result);
-      return result;
+      return response.json();
     },
+    onSuccess: () => {
+      // Invalidar tanto a lista quanto o item específico
+      queryClient.invalidateQueries({ queryKey: ["certificacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["certificacao", params?.id] });
+    }
   });
 
   if (isLoading) {
