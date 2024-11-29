@@ -228,7 +228,7 @@ export default function FormPergunta({
                 <FormItem>
                   <FormLabel>Explicação</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={4} placeholder="Explicação da resposta correta (opcional)" />
+                    <Textarea {...field} value={field.value || ''} rows={4} placeholder="Explicação da resposta correta (opcional)" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

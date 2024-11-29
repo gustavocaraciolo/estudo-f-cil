@@ -38,6 +38,7 @@ router.get("/:id", async (req, res) => {
       where: eq(perguntas.id, parseInt(id)),
       with: {
         respostas: true,
+        certificacao: true,
       },
     });
 
@@ -47,6 +48,7 @@ router.get("/:id", async (req, res) => {
 
     res.json(pergunta);
   } catch (error) {
+    console.error('Erro ao buscar pergunta:', error);
     res.status(500).json({ error: "Erro ao buscar pergunta" });
   }
 });

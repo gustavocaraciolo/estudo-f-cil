@@ -6,6 +6,7 @@ import type { InsertPergunta, Pergunta, Resposta } from "@db/schema";
 
 interface PerguntaWithRespostas extends Pergunta {
   respostas: Resposta[];
+  certificacao: Certificacao;
 }
 
 export default function EditPergunta() {
