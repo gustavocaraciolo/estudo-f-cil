@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Certificacao, Pergunta } from "@db/schema";
+import type { Certificacao, Pergunta, Resposta } from "@db/schema";
 
 export default function GerarJsonl() {
   const [selectedCertificacao, setSelectedCertificacao] = useState<string>();

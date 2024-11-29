@@ -36,7 +36,7 @@ router.get("/certificacao/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const perguntas = await db.query.perguntas.findMany({
-      where: eq(schema.perguntas.certificacao_id, parseInt(id)),
+      where: eq(perguntas.certificacao_id, parseInt(id)),
       with: {
         respostas: true,
       },
